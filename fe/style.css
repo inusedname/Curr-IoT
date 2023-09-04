@@ -5,3 +5,37 @@
 .main {
     padding-top: 70px;
 }
+
+.row {
+    padding-top: calc(var(--bs-gutter-x) * .5);
+    padding-bottom: calc(var(--bs-gutter-x) * .5);
+}
+
+.card {
+    justify-content: center;
+    align-items: end;
+    height: fit-content;
+}
+
+.card-body {
+    width: 100%;
+}
+
+.child.child-1 {
+    z-index: 1;
+}
+
+.child.child-2 {
+    display: flex;
+    z-index: 0;
+    position: absolute;
+    padding-right: 1rem;
+    height: 100%;
+    aspect-ratio: 1/1;
+    align-items: center;
+    justify-content: center;
+}
+
+img {
+    object-fit: cover;
+}

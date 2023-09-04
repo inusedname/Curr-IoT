@@ -1,20 +1,16 @@
 const ctx = document.getElementById('myChart');
 
 new Chart(ctx, {
-    type: 'bar',
+    type: 'line',
     data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        labels: ['7:00', '7:30', '8:00', '8:30', '9:00', '9:30'],
         datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            borderWidth: 1
+            label: 'Temp',
+            data: [28, 28.5, 28.5, 30, 29.1, 32],
+        },
+        {
+            label: 'Humidity',
+            data: [60, 65, 65, 70, 70, 75],
         }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
     }
 });
