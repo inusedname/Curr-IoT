@@ -10,7 +10,7 @@ val mqtt = MqttCenter()
 fun main() {
     // Initialize Firebase
     val options = FirebaseOptions.builder()
-        .setCredentials(GoogleCredentials.fromStream(FileInputStream("firebase-adminsdk.json")))
+        .setCredentials(GoogleCredentials.fromStream(FileInputStream("firebase-adminsdk-key.json")))
         .setDatabaseUrl("https://iot-center-6bcc3-default-rtdb.asia-southeast1.firebasedatabase.app/").build()
 
     FirebaseApp.initializeApp(options)
