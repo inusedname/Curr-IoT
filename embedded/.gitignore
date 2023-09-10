@@ -3,6 +3,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 firebase-adminsdk-key.json
+.lck
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

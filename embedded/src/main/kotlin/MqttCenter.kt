@@ -4,12 +4,12 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 
 const val BROKER = "tcp://test.mosquitto.org:1883"
 
-class MqttCenter {
+class MqttCenter(onGetDht: (String) -> Unit) {
     private val client = MqttClient(BROKER, MqttClient.generateClientId())
-    var onGetDht: (String) -> Unit = {}
 
     init {
         client.connect()
+        println(">> MQTT connected=${client.isConnected}")
         subscribe(DHT_TOPIC, onGetDht)
     }
 

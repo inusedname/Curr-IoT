@@ -9,9 +9,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MainVimel: ViewModel() {
+    private val remoteCenter = RemoteCenter()
+
     private val _rawMessage = MutableStateFlow(listOf<String>())
     val rawMessage = _rawMessage.asStateFlow()
-    private val remoteCenter = RemoteCenter()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -19,6 +20,10 @@ class MainVimel: ViewModel() {
                 _rawMessage.value = _rawMessage.value + it
             }
         }
+    }
+
+    fun toggleLed(boolean: Boolean) {
+        remoteCenter.toggleLed(boolean)
     }
 
     override fun onCleared() {

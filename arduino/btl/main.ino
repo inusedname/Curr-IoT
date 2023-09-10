@@ -1,4 +1,4 @@
-#define Log Serial.println
+#define Log(X) Serial.println(">> " + String(X))
 
 #define dhtPort 27
 #define dhtType DHT22
@@ -15,12 +15,20 @@
 #define MQTT_LED_TOPIC   "vstd/led"
 
 #include "DHT.h"
+#include <NTPClient.h>
 #include <WiFi.h> // <ESP8266WiFi.h>
 #include <ArduinoMqttClient.h>
+#include <ArduinoJson.h>
 
 WiFiClient wifi;
 MqttClient mqttClient(wifi);
 DHT dht(dhtPort, dhtType);
+
+/**
+* System.currentTimeMillis() need this
+*/
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
 
 void setup() {
   Serial.begin(115200);
@@ -30,24 +38,23 @@ void setup() {
   dht.begin();
   pinMode(ledPort, OUTPUT);
 
-  WiFi.begin(wifi_username, wifi_password, 6);
   // Connect to wifi
+  WiFi.begin(wifi_username, wifi_password, 6);
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
     Serial.print(".");
   }
   Log("Wifi Connected!");
-  Log();
 
   // Connect to mqtt
   if (!mqttClient.connect(MQTT_SERVER, MQTT_SERVERPORT)) {
     Serial.print(">> MQTT connection failed! Error code = ");
-    Log(mqttClient.connectError());
-
+    Serial.println(mqttClient.connectError());
     while (1);
   }
-  Log(">> You're connected to the MQTT broker!");
+  Log("MQTT Connected");
 
+  timeClient.begin();
   mqttClient.onMessage(onMqttMessage);
   mqttClient.subscribe(MQTT_LED_TOPIC);
 }
@@ -58,10 +65,11 @@ void onMqttMessage(int messageSize) {
 
 void loop() {
   mqttClient.poll();
+  timeClient.update();
   readDht();
 }
 
-int lastMs = millis() - 1000;
+int lastMs = millis();
 void readDht() {
   if (millis() - lastMs >= 1000) {
     lastMs = millis();
@@ -69,10 +77,21 @@ void readDht() {
     float temperature = dht.readTemperature();
 
     mqttClient.beginMessage(MQTT_DHT_TOPIC);
-    mqttClient.print(temperature);
+    mqttClient.print(jsonify(humidity, temperature));
     mqttClient.endMessage();
-
   }
+}
+
+char* jsonify(float humid, float temp) {
+  DynamicJsonDocument doc(1024);
+  doc["humid"] = humid;
+  doc["temp"] = temp;
+  doc["seconds"] = timeClient.getEpochTime();
+  
+  char* json = new char[256];
+  serializeJson(doc, json, 256);
+
+  return json;
 }
 
 void fetchLed() {

@@ -13,9 +13,11 @@ import kotlinx.coroutines.launch
 class RemoteCenter {
     private val db = Firebase.database
     private val sensorRef = db.getReference("sensorData")
+    private val ledRef = db.getReference("ledLight")
 
     private val _dataFlow = MutableStateFlow("")
     val dataFlow = _dataFlow as StateFlow<String>
+
     private val listener = object : ChildEventListener {
         override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
             GlobalScope.launch {
@@ -38,6 +40,10 @@ class RemoteCenter {
 
     init {
         sensorRef.addChildEventListener(listener)
+    }
+
+    fun toggleLed(boolean: Boolean) {
+        ledRef.setValue(boolean)
     }
 
     fun destroy() {

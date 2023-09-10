@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "author": "Nguyễn Viết Quang",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-breadboard-half", "id": "bb1", "top": -70.2, "left": -342.8, "attrs": {} },
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 4.7, "left": 4.6, "attrs": {} },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht1",
+      "top": -38.1,
+      "left": -264.6,
+      "attrs": { "temperature": "-23.7", "humidity": "42.5" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 34.8,
+      "left": -111.4,
+      "attrs": { "color": "red" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+    [ "esp:3V3", "bb1:bp.25", "green", [ "v21.91", "h-152.5", "v-64.31" ] ],
+    [ "bb1:bn.25", "esp:GND.1", "green", [ "v43.69", "h126.9", "v-21.25" ] ],
+    [ "bb1:25b.j", "esp:D26", "green", [ "v0" ] ],
+    [ "bb1:24b.j", "bb1:bn.20", "green", [ "v0" ] ],
+    [ "dht1:GND", "bb1:bn.9", "black", [ "v0" ] ],
+    [ "dht1:VCC", "bb1:bp.6", "red", [ "v0" ] ],
+    [ "dht1:SDA", "esp:D27", "green", [ "v0" ] ],
+    [ "led1:A", "bb1:25b.i", "", [ "$bb" ] ],
+    [ "led1:C", "bb1:24b.i", "", [ "$bb" ] ],
+    [ "dht1:VCC", "bb1:8b.i", "", [ "$bb" ] ],
+    [ "dht1:SDA", "bb1:9b.i", "", [ "$bb" ] ],
+    [ "dht1:NC", "bb1:10b.i", "", [ "$bb" ] ],
+    [ "dht1:GND", "bb1:11b.i", "", [ "$bb" ] ]
+  ],
+  "dependencies": {}
+}
