@@ -74,4 +74,13 @@ dependencies {
     // Add the dependency for the Realtime Database library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-database-ktx")
+
+    // gson
+    implementation("com.google.code.gson:gson:2.8.8")
+
+    // mpandroidchart
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    // viewModels()
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
 }

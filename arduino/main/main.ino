@@ -1,12 +1,12 @@
 #define Log(X) Serial.println(">> " + String(X))
 
-#define dhtPort 27
-#define dhtType DHT22
-#define ledPort 26
+#define dhtPort 2
+#define dhtType DHT11
+#define ledPort 15
 
 /************************* WiFi Access Point *********************************/
-#define wifi_username "Wokwi-GUEST"
-#define wifi_password ""
+#define wifi_username "Redmi Q"
+#define wifi_password "246813579"
 
 /************************* MQTT Setup *********************************/
 #define MQTT_SERVER      "test.mosquitto.org"
@@ -16,7 +16,8 @@
 
 #include "DHT.h"
 #include <NTPClient.h>
-#include <WiFi.h> // <ESP8266WiFi.h>
+#include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
 #include <ArduinoMqttClient.h>
 #include <ArduinoJson.h>
 
@@ -39,12 +40,13 @@ void setup() {
   pinMode(ledPort, OUTPUT);
 
   // Connect to wifi
-  WiFi.begin(wifi_username, wifi_password, 6);
+  WiFi.begin(wifi_username, wifi_password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
     Serial.print(".");
   }
-  Log("Wifi Connected!");
+  Serial.print("\nWifi Connected! as");
+  Serial.println(WiFi.localIP());
 
   // Connect to mqtt
   if (!mqttClient.connect(MQTT_SERVER, MQTT_SERVERPORT)) {
