@@ -4,13 +4,16 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.values
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class RemoteCenter {
     private val db = Firebase.database
@@ -50,6 +53,12 @@ class RemoteCenter {
 
     fun destroy() {
         sensorRef.removeEventListener(listener)
+    }
+
+    suspend fun getLed() : Boolean {
+        return coroutineScope {
+            ledRef.get().await().getValue(Boolean::class.java)!!
+        }
     }
 }
 

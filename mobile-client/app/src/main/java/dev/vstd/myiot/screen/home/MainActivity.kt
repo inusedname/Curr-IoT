@@ -5,34 +5,23 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.FirebaseApp
-import dev.vstd.myiot.R
 import dev.vstd.myiot.ui.theme.MyIOTTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         FirebaseApp.initializeApp(this)
 
         setContent {
@@ -43,6 +32,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
     private fun body() {
+        val vimel by viewModels<MainVimel>()
         val pagerState = rememberPagerState()
         val scope = rememberCoroutineScope()
         MyIOTTheme {
@@ -62,8 +52,8 @@ class MainActivity : ComponentActivity() {
                     HorizontalPager(pageCount = 2, state = pagerState) {
                         Column(Modifier.weight(1f)) {
                             when (it) {
-                                0 -> log_()
-                                1 -> dashboard_()
+                                0 -> log_(vimel)
+                                1 -> dashboard_(vimel)
                             }
                         }
                     }
@@ -72,112 +62,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    private fun log_() {
-        val vimel by viewModels<MainVimel>()
-        val messages by vimel.rawMessage.collectAsState()
-        val state = rememberLazyListState()
-        val scope = rememberCoroutineScope()
-        LaunchedEffect(key1 = messages) {
-            scope.launch {
-                if (messages.isNotEmpty()) {
-                    state.animateScrollToItem(messages.size - 1)
-                }
-            }
-        }
-        LazyColumn(
-            state = state,
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(messages) {
-                Row(verticalAlignment = Alignment.Top) {
-                    when (it.first) {
-                        MainVimel.Sender.FIREBASE -> {
-                            Image(
-                                painter = painterResource(id = R.drawable.firebase),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            BaseCard(
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color.Blue.copy(
-                                        alpha = 0.5f
-                                    )
-                                )
-                            ) {
-                                Text(text = it.second)
-                            }
-                        }
 
-                        MainVimel.Sender.USER -> {
-                            Image(
-                                painter = painterResource(id = R.drawable.user),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            BaseCard(
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color.Magenta.copy(
-                                        alpha = 0.5f
-                                    )
-                                )
-                            ) {
-                                Text(text = it.second)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @Composable
-    private fun dashboard_() {
-        val vimel by viewModels<MainVimel>()
-        val state by vimel.state.collectAsState()
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(16.dp)
-        ) {
-            item {
-                _float_block(title = "Temperature", value = state.temperature)
-            }
-            item {
-                _float_block(title = "Humidity", value = state.humidity)
-            }
-            item(span = { GridItemSpan(2) }) {
-                _switch_block(title = "LED", value = state.ledOn) {
-                    vimel.toggleLed(it)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun _float_block(title: String = "temp", value: Float = 27f, decimal: Int = 1) {
-    BaseCard {
-        Text(title)
-        Row(verticalAlignment = Alignment.Bottom) {
-            Text(String.format("%.${decimal}f", value), fontSize = 32.sp)
-            Text(text = "°C", fontSize = 12.sp)
-        }
-    }
-}
-
-@Composable
-private fun _switch_block(
-    title: String = "led",
-    value: Boolean = true,
-    onSwitch: (Boolean) -> Unit = {}
-) {
-    BaseCard {
-        Text(title)
-        Switch(checked = value, onCheckedChange = onSwitch)
-    }
 }
 
 @Composable
@@ -186,6 +71,18 @@ fun BaseCard(
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card {
+        Column(modifier = Modifier.padding(8.dp), content = content)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BaseCard(
+    onClick: () -> Unit,
+    colors: CardColors = CardDefaults.cardColors(),
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(onClick = onClick) {
         Column(modifier = Modifier.padding(8.dp), content = content)
     }
 }

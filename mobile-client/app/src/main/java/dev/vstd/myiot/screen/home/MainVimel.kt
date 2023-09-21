@@ -20,38 +20,29 @@ class MainVimel : ViewModel() {
     data class UiState(
         val temperature: Float = 0f,
         val humidity: Float = 0f,
+        val time: Long = 0L,
         val ledOn: Boolean = false
     )
 
     val state = MutableStateFlow(UiState())
-
-    fun update(setter: (UiState) -> UiState) {
-        state.value = setter(state.value)
-    }
+    private var buttonOn: Boolean = false
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
+            remoteCenter.getLed()
             remoteCenter.dataFlow.collect { data ->
                 rawMessage.value = rawMessage.value + (Sender.FIREBASE to data)
-                println(">> Receive: $data")
                 val pojo = deserialize(data)
-                update {
-                    it.copy(
-                        temperature = pojo.temp,
-                        humidity = pojo.humid
-                    )
-                }
+                state.emit(UiState(pojo.temp, pojo.humid, pojo.seconds, buttonOn))
             }
         }
     }
 
-    fun toggleLed(boolean: Boolean) {
+    fun toggleLed(boolean: Boolean = !buttonOn) {
         remoteCenter.toggleLed(boolean)
-        update {
-            viewModelScope.launch {
-                rawMessage.value += Sender.USER to "Toggle LED: $boolean"
-            }
-            it.copy(ledOn = boolean)
+        buttonOn = boolean
+        viewModelScope.launch {
+            rawMessage.value += Sender.USER to "Toggle LED: $boolean"
         }
     }
 

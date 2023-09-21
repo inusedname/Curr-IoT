@@ -24,10 +24,10 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Color.White,
+    primary = Red,
     surface = Color.White,
+    background = GrayBackground,
+    surfaceVariant = Color.White,
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -67,7 +67,7 @@ fun MyIOTTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = BloodPressureTypography,
         content = content
     )
 }
