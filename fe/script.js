@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js'
-import { getDatabase, ref, onChildAdded, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js"
+import { getDatabase, ref, onChildAdded, set, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js"
 import { firebaseConfig } from './secrets.js'
 
 const ctx = document.getElementById('myChart');
@@ -16,7 +16,7 @@ let chart = new Chart(ctx, {
     }
 });
 
-function addData (temp, humid) {
+function addData (temp, humid, light) {
     chart.data.labels.push('10:00');
     if (chart.data.datasets[0].data.length > 9) {
         chart.data.labels.shift();
@@ -35,16 +35,24 @@ const ledRef = ref(database, 'led');
 
 let textHumid = document.getElementById('text-humid');
 let textTemp = document.getElementById('text-temp');
+let textLight = document.getElementById('text-light');
+let livingRoomSwitch = document.getElementById('living-room-switch');
+
 
 onChildAdded(sensorRef, (snapshot) => {
     const data = snapshot.val();
     const obj = JSON.parse(data);
     textHumid.innerHTML = obj.humid.toFixed(1);
     textTemp.innerHTML = obj.temp.toFixed(1);
+    textLight.innerHTML = obj.lux.toFixed(1);
     addData(obj.temp, obj.humid);
 });
 
-let livingRoomSwitch = document.getElementById('living-room-switch');
+onValue(ledRef, (snapshot) => {
+    const data = snapshot.val();
+    livingRoomSwitch.checked = data;
+});
+
 livingRoomSwitch.addEventListener('change', function () {
     set(ledRef, this.checked);
 });

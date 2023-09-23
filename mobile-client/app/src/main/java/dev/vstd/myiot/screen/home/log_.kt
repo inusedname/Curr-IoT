@@ -1,6 +1,5 @@
 package dev.vstd.myiot.screen.home
 
-import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -38,7 +37,10 @@ fun log_(vimel: MainVimel) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(messages) {
-            Row(verticalAlignment = Alignment.Top) {
+            Row(
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 when (it.first) {
                     MainVimel.Sender.FIREBASE -> {
                         Image(

@@ -3,10 +3,13 @@
 #define dhtPort 2
 #define dhtType DHT11
 #define ledPort 15
+#define photoPort A0
 
 /************************* WiFi Access Point *********************************/
-#define wifi_username "Redmi Q"
-#define wifi_password "246813579"
+// #define wifi_username "PhongNgu3"
+// #define wifi_password "246813579"
+#define wifi_username "1021_PhongNgu3N"
+#define wifi_password "Quanglinh21"
 
 /************************* MQTT Setup *********************************/
 #define MQTT_SERVER      "test.mosquitto.org"
@@ -35,11 +38,11 @@ void setup() {
   Serial.begin(115200);
   Log("Hello, ESP32!");
 
-  // Setup components
+// Setup components
   dht.begin();
   pinMode(ledPort, OUTPUT);
 
-  // Connect to wifi
+// Connect to wifi
   WiFi.begin(wifi_username, wifi_password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
@@ -77,23 +80,33 @@ void readDht() {
     lastMs = millis();
     float humidity = dht.readHumidity();
     float temperature = dht.readTemperature();
+    float lux = getLux();
 
     mqttClient.beginMessage(MQTT_DHT_TOPIC);
-    mqttClient.print(jsonify(humidity, temperature));
+    mqttClient.print(jsonify(humidity, temperature, lux));
     mqttClient.endMessage();
   }
 }
 
-char* jsonify(float humid, float temp) {
+char* jsonify(float humid, float temp, float lux) {
   DynamicJsonDocument doc(1024);
   doc["humid"] = humid;
   doc["temp"] = temp;
+  doc["lux"] = lux;
   doc["seconds"] = timeClient.getEpochTime();
   
   char* json = new char[256];
   serializeJson(doc, json, 256);
 
   return json;
+}
+
+float getLux() {
+  int analogValue = 1024 - analogRead(A0);
+  float voltage = analogValue / 1024. * 3.3;
+  float resistance = 2000 * voltage / (1 - voltage / 3.3);
+  float lux = pow(50 * 1e3 * pow(10, 0.7) / resistance, (1 / 0.7));
+  return lux;
 }
 
 void fetchLed() {

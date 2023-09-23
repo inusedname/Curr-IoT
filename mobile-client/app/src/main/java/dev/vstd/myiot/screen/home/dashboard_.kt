@@ -33,7 +33,10 @@ fun dashboard_(vimel: MainVimel) {
         item {
             _float_block(title = "Humidity", unit = "%", value = state.humidity)
         }
-        item(span = { GridItemSpan(2) }) {
+        item {
+            _float_block(title = "Lightness", unit = "lux", value = state.lux)
+        }
+        item {
             _switch_block(title = "LED", value = state.ledOn) {
                 vimel.toggleLed()
             }

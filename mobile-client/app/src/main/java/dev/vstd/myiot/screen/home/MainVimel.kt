@@ -1,5 +1,6 @@
 package dev.vstd.myiot.screen.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.GsonBuilder
@@ -9,7 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class MainVimel : ViewModel() {
-    private val remoteCenter = RemoteCenter()
+    private val remoteCenter = RemoteCenter().apply {
+        ledCallback = { buttonOn = it }
+    }
 
     val rawMessage = MutableStateFlow(listOf<Pair<Sender, String>>())
 
@@ -20,6 +23,7 @@ class MainVimel : ViewModel() {
     data class UiState(
         val temperature: Float = 0f,
         val humidity: Float = 0f,
+        val lux: Float = 0f,
         val time: Long = 0L,
         val ledOn: Boolean = false
     )
@@ -29,18 +33,17 @@ class MainVimel : ViewModel() {
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            remoteCenter.getLed()
+            remoteCenter.start()
             remoteCenter.dataFlow.collect { data ->
                 rawMessage.value = rawMessage.value + (Sender.FIREBASE to data)
                 val pojo = deserialize(data)
-                state.emit(UiState(pojo.temp, pojo.humid, pojo.seconds, buttonOn))
+                state.emit(UiState(pojo.temp, pojo.humid, pojo.lux, pojo.seconds, buttonOn))
             }
         }
     }
 
-    fun toggleLed(boolean: Boolean = !buttonOn) {
+    fun toggleLed(boolean: Boolean = !state.value.ledOn) {
         remoteCenter.toggleLed(boolean)
-        buttonOn = boolean
         viewModelScope.launch {
             rawMessage.value += Sender.USER to "Toggle LED: $boolean"
         }
@@ -59,6 +62,7 @@ class MainVimel : ViewModel() {
     data class RemotePOJO(
         val humid: Float,
         val temp: Float,
+        val lux: Float,
         val seconds: Long,
     )
 }
