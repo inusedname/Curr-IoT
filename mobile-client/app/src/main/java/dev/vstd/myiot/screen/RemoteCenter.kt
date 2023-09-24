@@ -8,26 +8,25 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class RemoteCenter {
     private val db = Firebase.database
     private val sensorRef = db.getReference("sensorData")
     private val ledRef = db.getReference("led")
 
-    private val _dataFlow = MutableSharedFlow<String>()
-    val dataFlow = _dataFlow as SharedFlow<String>
-    var ledCallback: (Boolean) -> Unit = {}
+    private val _sensorFlow = MutableSharedFlow<String>()
+    val dataFlow = _sensorFlow as SharedFlow<String>
+    private val _ledFlow = MutableSharedFlow<Boolean>()
+    val ledFlow = _ledFlow as SharedFlow<Boolean>
 
     @OptIn(DelicateCoroutinesApi::class)
     private val sensorListener = object : ChildEventListener {
         override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
             GlobalScope.launch {
-                _dataFlow.emit(snapshot.getValue(String::class.java)!!)
+                _sensorFlow.emit(snapshot.getValue(String::class.java)!!)
             }
         }
 
@@ -41,7 +40,7 @@ class RemoteCenter {
     private val ledListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
             GlobalScope.launch {
-                ledCallback.invoke(snapshot.getValue(Boolean::class.java)!!)
+                _ledFlow.emit(snapshot.getValue(Boolean::class.java)!!)
             }
         }
 
@@ -59,5 +58,6 @@ class RemoteCenter {
 
     fun destroy() {
         sensorRef.removeEventListener(sensorListener)
+        ledRef.removeEventListener(ledListener)
     }
 }

@@ -17,7 +17,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 
 @Composable
 fun dashboard_(vimel: MainVimel) {
-    val state by vimel.state.collectAsState()
+    val state by vimel.uiState.collectAsState()
     val context = LocalContext.current
     val chart = remember { TempHumidChart(context) }
 
