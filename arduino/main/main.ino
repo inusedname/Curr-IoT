@@ -6,10 +6,10 @@
 #define photoPort A0
 
 /************************* WiFi Access Point *********************************/
-// #define wifi_username "PhongNgu3"
-// #define wifi_password "246813579"
-#define wifi_username "1021_PhongNgu3N"
-#define wifi_password "Quanglinh21"
+#define wifi_username "Redmi Q"
+#define wifi_password "246813579"
+// #define wifi_username "1021_PhongNgu3N"
+// #define wifi_password "Quanglinh21"
 
 /************************* MQTT Setup *********************************/
 #define MQTT_SERVER      "test.mosquitto.org"
@@ -102,11 +102,11 @@ char* jsonify(float humid, float temp, float lux) {
 }
 
 float getLux() {
-  int analogValue = 1024 - analogRead(A0);
+  int analogValue = analogRead(A0);
   float voltage = analogValue / 1024. * 3.3;
   float resistance = 2000 * voltage / (1 - voltage / 3.3);
   float lux = pow(50 * 1e3 * pow(10, 0.7) / resistance, (1 / 0.7));
-  return lux;
+  return analogValue;
 }
 
 void fetchLed() {

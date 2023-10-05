@@ -14,9 +14,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import dev.vstd.myiot.screen.home.destinations.detail_Destination
 
 @Composable
-fun dashboard_(vimel: MainVimel) {
+fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
     val state by vimel.uiState.collectAsState()
     val context = LocalContext.current
     val chart = remember { TempHumidChart(context) }
@@ -28,13 +30,20 @@ fun dashboard_(vimel: MainVimel) {
         contentPadding = PaddingValues(16.dp)
     ) {
         item {
-            _float_block(title = "Temperature", unit = "oC", value = state.temperature)
+            _float_block(title = "Temperature", unit = "oC", value = state.temperature) {
+                Singleton.rawMessage = vimel.rawMessage.value.map { it.second }
+                navigator.navigate(detail_Destination)
+            }
         }
         item {
-            _float_block(title = "Humidity", unit = "%", value = state.humidity)
+            _float_block(title = "Humidity", unit = "%", value = state.humidity) {
+
+            }
         }
         item {
-            _float_block(title = "Lightness", unit = "lux", value = state.lux)
+            _float_block(title = "Lightness", unit = "lux", value = state.lux) {
+
+            }
         }
         item {
             _switch_block(title = "LED", value = state.ledOn) {
@@ -62,9 +71,10 @@ private fun _float_block(
     title: String = "temp",
     unit: String,
     value: Float = 27f,
-    decimal: Int = 1
+    decimal: Int = 1,
+    onClick: () -> Unit,
 ) {
-    BaseCard {
+    BaseCard(onClick = onClick) {
         Text(title, style = MaterialTheme.typography.titleLarge)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(String.format("%.${decimal}f", value), fontSize = 56.sp)

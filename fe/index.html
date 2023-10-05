@@ -18,11 +18,12 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top navbar-dark">
-        <div class="container-fluid">
+    <nav class="navbar navbar-expand-lg bg-light fixed-top navbar-light">
+        <div class="container-fluid" style="justify-content: end;">
             <a class="navbar-brand" href="#">
                 <img src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" alt="Bootstrap" width="30"
                     height="24">
+                <b style="margin-left: 1rem;">IOT Dashboard</b>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -32,30 +33,13 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        <a class="nav-link active" aria-current="page" href="">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            Dropdown
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Action</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                        <a class="nav-link aria-current=" page" href="profile">Profile</a>
                     </li>
                 </ul>
-                <form class="d-flex" role="search">
+                <form class=" d-flex" role="search">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
@@ -63,11 +47,24 @@
         </div>
     </nav>
     <div class="main container">
-        <div class="row">
-            <div class="col">
+        <div class="row equal-height-row">
+            <div class="col equal-height-col">
+                <div class="card">
+                    <div class="card-body border border-danger">
+                        <h3 class="card-title text-danger fw-bold">(1) CRITICAL</h3>
+                        -- NEED IMMEDIATE ATTENTION --
+                        <div class="bg-light" style="height: 1px; width: auto; margin-bottom: 1rem;"></div>
+                        <div>Humidity <span class="status-button text-danger">Severe <i
+                                    class="fa fa-exclamation-triangle" aria-hidden="true"></i></span></div>
+                        <div>Temperature <span class="status-button text-success">OK</span></div>
+                        <div>Luminousity <span class="status-button text-success">OK</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col equal-height-col">
                 <div class="card">
                     <div class="card-body child1">
-                        <h3>Temperature</h3>
+                        <h3 class="card-title">Temperature</h3>
                         <h1 id="text-temp">--</h1>
                     </div>
                     <div class="img-box child child-2">
@@ -75,33 +72,26 @@
                     </div>
                 </div>
             </div>
-            <div class="col">
+            <div class="col equal-height-col">
                 <div class="card">
                     <div class="card-body child1">
-                        <h3>Humidity</h3>
+                        <h3 class="card-title">Humidity</h3>
                         <h1 id="text-humid">--</h1>
                     </div>
                     <div class="img-box child child-2">
-                        <img src="https://img.icons8.com/3d-fluency/100/storm.png" alt="">
+                        <img width="94" height="94" src="https://img.icons8.com/3d-fluency/94/keep-dry.png"
+                            alt="keep-dry" />
                     </div>
                 </div>
             </div>
-            <div class="col">
+            <div class="col equal-height-col">
                 <div class="card">
                     <div class="card-body child1">
                         <h3>Light</h3>
                         <h1 id="text-light">--</h1>
                     </div>
                     <div class="img-box child child-2">
-                        <img src="https://img.icons8.com/3d-fluency/100/storm.png" alt="">
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <h3>Gas</h3>
-                        <h1>--</h1>
+                        <img width="94" height="94" src="https://img.icons8.com/3d-fluency/94/sun.png" alt="sun" />
                     </div>
                 </div>
             </div>
@@ -117,8 +107,8 @@
             </div>
             <div class="col-md-3">
                 <div class="row-md-3">
-                    <div class="card">
-                        <div class="card-body">
+                    <div class="card bg-dark text-white">
+                        <div class="card-body child 1">
                             <h3>Living Room</h3>
                             <!-- switch -->
                             <div class="form-check form-switch fs-1">
@@ -126,10 +116,14 @@
                                     checked>
                             </div>
                         </div>
+                        <div class="img-box child child-2">
+                            <img width="94" height="94" src="https://img.icons8.com/3d-fluency/94/idea.png"
+                                alt="idea" />
+                        </div>
                     </div>
                 </div>
-                <div class="row-md-3">
-                    <div class="card">
+                <div class="row-md-3" style="margin-top: 8px;">
+                    <div class=" card bg-dark text-white">
                         <div class="card-body">
                             <h3>Bed Room</h3>
                             <div class="form-check form-switch fs-1">
@@ -137,11 +131,16 @@
                                     checked disabled>
                             </div>
                         </div>
+                        <div class="img-box child child-2">
+                            <img width="94" height="94" src="https://img.icons8.com/3d-fluency/94/air-conditioner.png"
+                                alt="air-conditioner" />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <div style="height: 10rem;" />
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>

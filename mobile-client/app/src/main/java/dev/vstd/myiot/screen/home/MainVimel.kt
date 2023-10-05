@@ -16,7 +16,6 @@ class MainVimel : ViewModel() {
 
     val rawMessage = MutableStateFlow<List<Pair<Sender, String>>>(emptyList())
     val uiState = combine(remoteCenter.dataFlow, remoteCenter.ledFlow) { rawMessage, ledOn ->
-        Log.d(TAG, "Update")
         val pojo = RemotePOJO.fromJson(rawMessage)
         UiState(
             temperature = pojo.temp,
