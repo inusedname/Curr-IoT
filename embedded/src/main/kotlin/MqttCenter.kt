@@ -4,17 +4,20 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 
 const val BROKER = "tcp://test.mosquitto.org:1883"
 
-class MqttCenter(onGetDht: (String) -> Unit) {
+class MqttCenter(onGetSensorData: (String) -> Unit) {
     private val client = MqttClient(BROKER, MqttClient.generateClientId())
 
     init {
         client.connect()
         println(">> MQTT connected=${client.isConnected}")
-        subscribe(DHT_TOPIC, onGetDht)
+        subscribe(SENSOR_TOPIC, onGetSensorData)
     }
 
-    fun toggleLed(on: Boolean) {
-        publish(LED_TOPIC, if (on) "true" else "false")
+    fun toggleLed(which: Int, on: Boolean) {
+        when(which) {
+            1 -> publish(LED1_TOPIC, if (on) "true" else "false")
+            2 -> publish(LED2_TOPIC, if (on) "true" else "false")
+        }
     }
 
     private fun subscribe(topic: String, callback: (String) -> Unit) {
@@ -23,7 +26,7 @@ class MqttCenter(onGetDht: (String) -> Unit) {
         }
     }
 
-    fun publish(topic: String, message: String) {
+    private fun publish(topic: String, message: String) {
         client.publish(topic, MqttMessage(message.toByteArray()))
     }
 
@@ -32,7 +35,8 @@ class MqttCenter(onGetDht: (String) -> Unit) {
     }
 
     companion object {
-        const val DHT_TOPIC = "vstd/dht"
-        const val LED_TOPIC = "vstd/led"
+        const val SENSOR_TOPIC = "vstd/sensor"
+        const val LED1_TOPIC = "vstd/led1"
+        const val LED2_TOPIC = "vstd/led2"
     }
 }

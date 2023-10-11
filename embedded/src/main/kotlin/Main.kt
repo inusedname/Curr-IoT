@@ -1,11 +1,10 @@
-
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import java.io.FileInputStream
 
 fun main() {
@@ -15,21 +14,52 @@ fun main() {
         .setDatabaseUrl("https://iot-center-6bcc3-default-rtdb.asia-southeast1.firebasedatabase.app/").build()
 
     FirebaseApp.initializeApp(options)
-    val sensorDataRef = FirebaseDatabase.getInstance().getReference("sensorData")
-    val ledRef = FirebaseDatabase.getInstance().getReference("led")
-
+    val sensorPush = FirebaseDatabase.getInstance().getReference("sensorData")
+    val statusPull = FirebaseDatabase.getInstance().getReference("status")
+    val ledHistory = FirebaseDatabase.getInstance().getReference("ledHistory")
+    val statusSnapshot = emptyMap<String, Boolean>().toMutableMap()
     val mqtt = MqttCenter {
         println(">> MQTT received: $it")
-        sensorDataRef.push().setValueAsync(it)
+        sensorPush.push().setValueAsync(it)
     }
 
     // Listen to led toggle variable and notify to MQTT
-    ledRef.addValueEventListener(object : ValueEventListener {
-        override fun onDataChange(snapshot: DataSnapshot) {
-            val bool = snapshot.getValue(Boolean::class.java)
-            println(">> LED toggled=$bool")
-            mqtt.toggleLed(bool)
+    statusPull.addChildEventListener(object : ChildEventListener {
+        override fun onChildAdded(snapshot: DataSnapshot?, previousChildName: String?) {
+            snapshot?.let {
+                val key = it.key
+                val body = it.value as Map<String, Any>
+                val bool = body["on"] as Boolean
+                println(">> Startup: Device#$key, value=$bool")
+                when (key) {
+                    "l1" -> mqtt.toggleLed(1, bool)
+                    "l2" -> mqtt.toggleLed(2, bool)
+                }
+                statusSnapshot.put(key, bool)
+            }
         }
+
+        override fun onChildChanged(snapshot: DataSnapshot?, previousChildName: String?) {
+            snapshot?.let {
+                val key = it.key
+                val body = it.value as Map<String, Any>
+                val bool = body["on"] as Boolean
+                println(">> Update: Device#${key} value=${bool}")
+                when (key) {
+                    "l1" -> mqtt.toggleLed(1, bool)
+                    "l2" -> mqtt.toggleLed(2, bool)
+                }
+                ledHistory.push().setValueAsync(
+                    """
+                        { "id": "$key", "on": $bool, "time": ${System.currentTimeMillis() / 1000} }
+                    """.trimIndent()
+                )
+            }
+        }
+
+        override fun onChildRemoved(snapshot: DataSnapshot?) {}
+
+        override fun onChildMoved(snapshot: DataSnapshot?, previousChildName: String?) {}
 
         override fun onCancelled(error: DatabaseError) {
             println(error.code.toString() + ": " + error.message)
