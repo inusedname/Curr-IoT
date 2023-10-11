@@ -47,8 +47,8 @@
         </div>
     </nav>
     <div class="main container">
-        <div class="row equal-height-row">
-            <div class="col equal-height-col">
+        <div class="row">
+            <!-- <div class="col equal-height-col">
                 <div class="card">
                     <div class="card-body border border-danger">
                         <h3 class="card-title text-danger fw-bold">(1) CRITICAL</h3>
@@ -60,37 +60,48 @@
                         <div>Luminousity <span class="status-button text-success">OK</span></div>
                     </div>
                 </div>
-            </div>
-            <div class="col equal-height-col">
-                <div class="card">
-                    <div class="card-body child1">
+            </div> -->
+            <div class="col">
+                <div class="card text-white card-stateful" id="card-temp">
+                    <div class="card-body child-1">
                         <h3 class="card-title">Temperature</h3>
                         <h1 id="text-temp">--</h1>
                     </div>
-                    <div class="img-box child child-2">
+                    <div class="img-box child-2">
                         <img src="https://img.icons8.com/3d-fluency/100/storm.png" alt="">
                     </div>
                 </div>
             </div>
-            <div class="col equal-height-col">
-                <div class="card">
-                    <div class="card-body child1">
+            <div class="col">
+                <div class="card text-white card-stateful" id="card-humid">
+                    <div class="card-body child-1">
                         <h3 class="card-title">Humidity</h3>
                         <h1 id="text-humid">--</h1>
                     </div>
-                    <div class="img-box child child-2">
+                    <div class="img-box child-2">
                         <img width="94" height="94" src="https://img.icons8.com/3d-fluency/94/keep-dry.png"
                             alt="keep-dry" />
                     </div>
                 </div>
             </div>
-            <div class="col equal-height-col">
-                <div class="card">
-                    <div class="card-body child1">
+            <div class="col">
+                <div class="card text-white card-stateful" id="card-light">
+                    <div class="card-body child-1">
                         <h3>Light</h3>
                         <h1 id="text-light">--</h1>
                     </div>
-                    <div class="img-box child child-2">
+                    <div class="img-box child-2">
+                        <img width="94" height="94" src="https://img.icons8.com/3d-fluency/94/sun.png" alt="sun" />
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body child-1">
+                        <h3>Light</h3>
+                        <h1>--</h1>
+                    </div>
+                    <div class="img-box child-2">
                         <img width="94" height="94" src="https://img.icons8.com/3d-fluency/94/sun.png" alt="sun" />
                     </div>
                 </div>
@@ -112,8 +123,7 @@
                             <h3>Living Room</h3>
                             <!-- switch -->
                             <div class="form-check form-switch fs-1">
-                                <input class="form-check-input" type="checkbox" role="switch" id="living-room-switch"
-                                    checked>
+                                <input class="form-check-input" type="checkbox" role="switch" id="living-room-switch">
                             </div>
                         </div>
                         <div class="img-box child child-2">
@@ -127,8 +137,7 @@
                         <div class="card-body">
                             <h3>Bed Room</h3>
                             <div class="form-check form-switch fs-1">
-                                <input class="form-check-input" type="checkbox" role="switch" id="bedroom-switch"
-                                    checked disabled>
+                                <input class="form-check-input" type="checkbox" role="switch" id="bedroom-switch">
                             </div>
                         </div>
                         <div class="img-box child child-2">
@@ -144,9 +153,9 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js"
+    <!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js"
         integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
-        crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js"
         integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
         crossorigin="anonymous"></script>

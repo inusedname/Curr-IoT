@@ -25,6 +25,13 @@
       "top": -140.8,
       "left": -268,
       "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led2",
+      "top": 34.8,
+      "left": -159.4,
+      "attrs": { "color": "red" }
     }
   ],
   "connections": [
@@ -32,20 +39,24 @@
     [ "esp:RX0", "$serialMonitor:TX", "", [] ],
     [ "esp:3V3", "bb1:bp.25", "green", [ "v21.91", "h-152.5", "v-64.31" ] ],
     [ "bb1:bn.25", "esp:GND.1", "green", [ "v43.69", "h126.9", "v-21.25" ] ],
-    [ "bb1:25b.j", "esp:D26", "green", [ "v0" ] ],
-    [ "bb1:24b.j", "bb1:bn.20", "green", [ "v0" ] ],
     [ "dht1:GND", "bb1:bn.9", "black", [ "v0" ] ],
     [ "dht1:VCC", "bb1:bp.6", "red", [ "v0" ] ],
-    [ "dht1:SDA", "esp:D27", "green", [ "v0" ] ],
     [ "ldr1:VCC", "bb1:bp.23", "red", [ "h0" ] ],
     [ "ldr1:GND", "bb1:bn.22", "black", [ "h0" ] ],
-    [ "ldr1:AO", "esp:D33", "green", [ "h0" ] ],
     [ "dht1:VCC", "bb1:8b.i", "", [ "$bb" ] ],
     [ "dht1:SDA", "bb1:9b.i", "", [ "$bb" ] ],
     [ "dht1:NC", "bb1:10b.i", "", [ "$bb" ] ],
     [ "dht1:GND", "bb1:11b.i", "", [ "$bb" ] ],
     [ "led1:A", "bb1:25b.i", "", [ "$bb" ] ],
-    [ "led1:C", "bb1:24b.i", "", [ "$bb" ] ]
+    [ "led1:C", "bb1:24b.i", "", [ "$bb" ] ],
+    [ "esp:D15", "dht1:SDA", "green", [ "h0" ] ],
+    [ "led2:A", "bb1:20b.i", "", [ "$bb" ] ],
+    [ "led2:C", "bb1:19b.i", "", [ "$bb" ] ],
+    [ "led2:C", "bb1:bn.16", "green", [ "v0" ] ],
+    [ "led1:C", "bb1:bn.20", "green", [ "v0" ] ],
+    [ "led2:A", "esp:D12", "green", [ "v0" ] ],
+    [ "led1:A", "esp:D14", "green", [ "v0" ] ],
+    [ "ldr1:AO", "esp:D32", "green", [ "h67.2", "v172.1" ] ]
   ],
   "dependencies": {}
 }

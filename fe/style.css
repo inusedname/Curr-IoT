@@ -2,6 +2,12 @@
     font-family: 'Poppins', sans-serif;
 }
 
+:root {
+    --good-gradient: linear-gradient(to right, #00c853, #00e676);
+    --warning-gradient: linear-gradient(to right, #ffd600, #ffea00);
+    --severe-gradient: linear-gradient(to right, #d50000, #ff1744)
+}
+
 .main {
     padding-top: 70px;
 }
@@ -20,20 +26,22 @@
     width: 100%;
 }
 
-.child.child-1 {
+.child-1 {
     z-index: 1;
 }
 
-.child.child-2 {
+.child-2 {
     display: flex;
     z-index: 0;
     position: absolute;
     padding-right: 1rem;
     height: 100%;
     aspect-ratio: 1/1;
-    align-items: center;
-    justify-content: center;
+    align-items: end;
+    justify-content: end;
 }
+
+
 
 img {
     object-fit: cover;
@@ -42,14 +50,4 @@ img {
 .status-button {
     font-weight: bold;
     float: right;
-}
-
-.equal-height-row {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.equal-height-col {
-    flex: 1;
-    /* Optional spacing between columns */
 }

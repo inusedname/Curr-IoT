@@ -1,23 +1,28 @@
 #define Log(X) Serial.println(">> " + String(X))
 
-#define dhtPort 2
-#define dhtType DHT11
-#define ledPort 15
-#define photoPort A0
+#define dhtPort             2
+#define led1Port            4
+#define led2Port            5
+#define photoPort           A0 // 32
+#define dhtType             DHT11
 
 /************************* WiFi Access Point *********************************/
-#define wifi_username "Redmi Q"
-#define wifi_password "246813579"
-// #define wifi_username "1021_PhongNgu3N"
-// #define wifi_password "Quanglinh21"
+// #define wifi_username       "Wokwi-GUEST"
+// #define wifi_password       ""
+// #define wifi_username "Redmi Q"
+// #define wifi_password "246813579"
+#define wifi_username       "PhongNgu3N"
+#define wifi_password       "Quanglinh21"
 
 /************************* MQTT Setup *********************************/
-#define MQTT_SERVER      "test.mosquitto.org"
-#define MQTT_SERVERPORT  1883
-#define MQTT_DHT_TOPIC   "vstd/dht"
-#define MQTT_LED_TOPIC   "vstd/led"
+#define MQTT_SERVER         "test.mosquitto.org"
+#define MQTT_SERVERPORT     1883
+#define MQTT_SENSOR_TOPIC   "vstd/sensor"
+#define MQTT_LED1_TOPIC     "vstd/led1"
+#define MQTT_LED2_TOPIC     "vstd/led2"
 
 #include "DHT.h"
+#include <Arduino_DebugUtils.h>
 #include <NTPClient.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
@@ -33,39 +38,65 @@ DHT dht(dhtPort, dhtType);
 */
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
+int lastMs = millis();
 
 void setup() {
   Serial.begin(115200);
   Log("Hello, ESP32!");
+  Debug.timestampOn();
+  pinMode(led1Port, OUTPUT);
+  pinMode(led2Port, OUTPUT);
 
-// Setup components
+  connectWifi();
+  connectMqtt();
+  
+  timeClient.begin();
   dht.begin();
-  pinMode(ledPort, OUTPUT);
+  mqttClient.onMessage(onMqttMessage);
+  mqttClient.subscribe(MQTT_LED1_TOPIC);
+  mqttClient.subscribe(MQTT_LED2_TOPIC);
+}
 
-// Connect to wifi
+void onMqttMessage(int messageSize) {
+  String topic = mqttClient.messageTopic();
+  DEBUG_INFO("New message: topic=%s", topic);
+  String message = "";
+  while (mqttClient.available()) {
+    char c = mqttClient.read();
+    message += String(c);
+  }
+  DEBUG_INFO("%s", message);
+  if (topic == MQTT_LED1_TOPIC) {
+    setLed(1, message == "true" ? true : false);
+  } else if (topic == MQTT_LED2_TOPIC) {
+    setLed(2, message == "true" ? true : false);
+  }
+}
+
+void setLed(int which, bool enable) {
+  if (enable) {
+    digitalWrite(which == 1 ? led1Port : led2Port, HIGH);
+  } else {
+    digitalWrite(which == 1 ? led1Port : led2Port, LOW);
+  }
+}
+
+void connectWifi() {
   WiFi.begin(wifi_username, wifi_password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
     Serial.print(".");
   }
-  Serial.print("\nWifi Connected! as");
-  Serial.println(WiFi.localIP());
-
-  // Connect to mqtt
-  if (!mqttClient.connect(MQTT_SERVER, MQTT_SERVERPORT)) {
-    Serial.print(">> MQTT connection failed! Error code = ");
-    Serial.println(mqttClient.connectError());
-    while (1);
-  }
-  Log("MQTT Connected");
-
-  timeClient.begin();
-  mqttClient.onMessage(onMqttMessage);
-  mqttClient.subscribe(MQTT_LED_TOPIC);
+  Serial.println();
+  DEBUG_INFO("Wifi Connected! as %s", WiFi.localIP().toString());
 }
 
-void onMqttMessage(int messageSize) {
-  fetchLed();
+void connectMqtt() {
+  if (!mqttClient.connect(MQTT_SERVER, MQTT_SERVERPORT)) {
+    DEBUG_ERROR("MQTT connection failed! Error code = %d", mqttClient.connectError());
+    return;
+  }
+  DEBUG_INFO("MQTT Connected!");
 }
 
 void loop() {
@@ -74,61 +105,28 @@ void loop() {
   readDht();
 }
 
-int lastMs = millis();
 void readDht() {
   if (millis() - lastMs >= 1000) {
     lastMs = millis();
     float humidity = dht.readHumidity();
     float temperature = dht.readTemperature();
-    float lux = getLux();
+    float lux = analogRead(photoPort);
 
-    mqttClient.beginMessage(MQTT_DHT_TOPIC);
-    mqttClient.print(jsonify(humidity, temperature, lux));
+    mqttClient.beginMessage(MQTT_SENSOR_TOPIC);
+    mqttClient.print(jsonify(humidity, temperature, lux, timeClient.getEpochTime()));
     mqttClient.endMessage();
   }
 }
 
-char* jsonify(float humid, float temp, float lux) {
+char* jsonify(float humid, float temp, float lux, int time) {
   DynamicJsonDocument doc(1024);
   doc["humid"] = humid;
   doc["temp"] = temp;
   doc["lux"] = lux;
-  doc["seconds"] = timeClient.getEpochTime();
+  doc["seconds"] = time;
   
   char* json = new char[256];
   serializeJson(doc, json, 256);
 
   return json;
-}
-
-float getLux() {
-  int analogValue = analogRead(A0);
-  float voltage = analogValue / 1024. * 3.3;
-  float resistance = 2000 * voltage / (1 - voltage / 3.3);
-  float lux = pow(50 * 1e3 * pow(10, 0.7) / resistance, (1 / 0.7));
-  return analogValue;
-}
-
-void fetchLed() {
-  Log("Received a message with topic");
-  Log(mqttClient.messageTopic());
-  String state = "";
-  while (mqttClient.available()) {
-    char c = mqttClient.read();
-    state += String(c);
-  }
-  Log(state);
-  if (state == "true") {
-    setLed(true);
-  } else {
-    setLed(false);
-  }
-}
-
-void setLed(bool enable) {
-  if (enable) {
-    digitalWrite(ledPort, HIGH);
-  } else {
-    digitalWrite(ledPort, LOW);
-  }
 }
