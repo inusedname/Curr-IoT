@@ -1,10 +1,9 @@
 package dev.vstd.myiot.screen.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.GsonBuilder
-import dev.vstd.myiot.screen.RemoteCenter
+import dev.vstd.myiot.data.LedHistoryModel
+import dev.vstd.myiot.data.RemoteCenter
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -15,32 +14,44 @@ class MainVimel : ViewModel() {
     private val remoteCenter = RemoteCenter()
 
     val rawMessage = MutableStateFlow<List<Pair<Sender, String>>>(emptyList())
-    val uiState = combine(remoteCenter.dataFlow, remoteCenter.ledFlow) { rawMessage, ledOn ->
-        val pojo = RemotePOJO.fromJson(rawMessage)
-        UiState(
-            temperature = pojo.temp,
-            humidity = pojo.humid,
-            lux = pojo.lux,
-            time = pojo.seconds,
-            ledOn = ledOn
-        )
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, UiState())
+    val uiState = MutableStateFlow(UiState())
 
     init {
         remoteCenter.start()
         viewModelScope.launch {
-            remoteCenter.dataFlow.collect {
-                viewModelScope.launch {
+            launch {
+                remoteCenter.dataFlow.collect {
                     rawMessage.value += Sender.FIREBASE to it
+                    val sensorData = SensorModel.fromJson(it)
+                    uiState.value = uiState.value.copy(
+                        temperature = sensorData.temp,
+                        humidity = sensorData.humid,
+                        lux = sensorData.lux,
+                        time = sensorData.seconds,
+                    )
+                }
+            }
+            launch {
+                remoteCenter.ledFlow.collect {
+                    rawMessage.value += Sender.USER to it
+                    val ledHistory = LedHistoryModel.fromJson(it)
+                    when (ledHistory.which) {
+                        1 -> {
+                            uiState.value = uiState.value.copy(led1On = ledHistory.on)
+                        }
+                        2 -> {
+                            uiState.value = uiState.value.copy(led2On = ledHistory.on)
+                        }
+                    }
                 }
             }
         }
     }
 
-    fun toggleLed(boolean: Boolean = !uiState.value.ledOn) {
-        remoteCenter.toggleLed(boolean)
+    fun toggleLed(which: Int, boolean: Boolean) {
+        remoteCenter.toggleLed(which, boolean)
         viewModelScope.launch {
-            rawMessage.value += Sender.USER to "Toggle LED: $boolean"
+            rawMessage.value += Sender.USER to "Toggle LED$which: $boolean"
         }
     }
 
@@ -58,20 +69,7 @@ class MainVimel : ViewModel() {
         val humidity: Float = 0f,
         val lux: Float = 0f,
         val time: Long = 0L,
-        val ledOn: Boolean = false
+        val led1On: Boolean = false,
+        val led2On: Boolean = false,
     )
-
-    data class RemotePOJO(
-        val humid: Float,
-        val temp: Float,
-        val lux: Float,
-        val seconds: Long,
-    ) {
-        companion object {
-            fun fromJson(json: String): RemotePOJO {
-                val gson = GsonBuilder().create()
-                return gson.fromJson(json, RemotePOJO::class.java)
-            }
-        }
-    }
 }

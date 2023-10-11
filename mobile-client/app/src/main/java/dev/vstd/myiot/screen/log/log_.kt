@@ -1,4 +1,4 @@
-package dev.vstd.myiot.screen.home
+package dev.vstd.myiot.screen.log
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import dev.vstd.myiot.R
+import dev.vstd.myiot.BaseCard
+import dev.vstd.myiot.screen.home.MainVimel
 import kotlinx.coroutines.launch
 
 @Composable

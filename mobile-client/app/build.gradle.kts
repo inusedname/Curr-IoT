@@ -75,6 +75,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     implementation("com.google.android.material:material:1.8.0")
+    implementation("com.jakewharton.timber:timber:5.0.1")
 
     implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
     implementation("io.github.raamcosta.compose-destinations:core:1.8.42-beta")

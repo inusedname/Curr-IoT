@@ -7,7 +7,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -15,7 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.vstd.myiot.screen.home.destinations.detail_Destination
+import dev.vstd.myiot.BaseCard
+import dev.vstd.myiot.data.Singleton
+import dev.vstd.myiot.destinations.detail_Destination
 
 @Composable
 fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
@@ -46,8 +51,13 @@ fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
             }
         }
         item {
-            _switch_block(title = "LED", value = state.ledOn) {
-                vimel.toggleLed()
+            _switch_block(title = "Bedroom Light", value = state.led1On) {
+                vimel.toggleLed(0, !state.led1On)
+            }
+        }
+        item {
+            _switch_block(title = "Fan", value = state.led2On) {
+                vimel.toggleLed(1, !state.led2On)
             }
         }
         item(span = { GridItemSpan(2) }) {

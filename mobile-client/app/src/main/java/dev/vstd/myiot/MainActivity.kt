@@ -1,10 +1,7 @@
-package dev.vstd.myiot.screen.home
+package dev.vstd.myiot
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -23,13 +20,23 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import dev.vstd.myiot.screen.home.MainVimel
+import dev.vstd.myiot.screen.home.dashboard_
+import dev.vstd.myiot.screen.log.log_
 import dev.vstd.myiot.ui.theme.MyIOTTheme
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
+        // Plant Timber
+        Timber.plant(object : Timber.DebugTree() {
+            override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+                super.log(priority, tag, "$tag >> $message", t)
+            }
+        })
 
         setContent {
             DestinationsNavHost(navGraph = NavGraphs.root)

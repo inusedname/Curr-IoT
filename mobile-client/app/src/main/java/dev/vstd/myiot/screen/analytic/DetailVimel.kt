@@ -1,17 +1,18 @@
-package dev.vstd.myiot.screen.home
+package dev.vstd.myiot.screen.analytic
 
 import androidx.lifecycle.ViewModel
-import dev.vstd.myiot.screen.home.Singleton.rawMessage
+import dev.vstd.myiot.screen.home.MainVimel
+import dev.vstd.myiot.screen.home.SensorModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class DetailVimel : ViewModel() {
     private val allData = MutableStateFlow(listOf<Pair<Float, Long>>())
     val uiData = MutableStateFlow(listOf<Pair<Float, Long>>())
-    var increased = true
+    private var increased = false
 
     fun setData(data: List<String>) {
         allData.value = data.map {
-            val pojo = MainVimel.RemotePOJO.fromJson(it)
+            val pojo = SensorModel.fromJson(it)
             pojo.temp to pojo.seconds * 1000
         }
         uiData.value = allData.value
