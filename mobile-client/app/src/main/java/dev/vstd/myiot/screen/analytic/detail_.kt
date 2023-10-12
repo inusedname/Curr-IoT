@@ -1,6 +1,7 @@
 package dev.vstd.myiot.screen.analytic
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,7 +11,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.FilterAlt
-import androidx.compose.material.icons.rounded.Sort
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -29,6 +30,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.vstd.myiot.R
 import dev.vstd.myiot.data.Singleton
+import dev.vstd.myiot.screen.analytic.DetailVimel.Type
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -41,7 +43,7 @@ const val LUX = 2
 @Destination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun detail_(navigator: DestinationsNavigator, type: Int) {
+fun detail_(navigator: DestinationsNavigator) {
     val vimel: DetailVimel = viewModel()
     val activity = LocalContext.current as FragmentActivity
 
@@ -56,7 +58,7 @@ fun detail_(navigator: DestinationsNavigator, type: Int) {
     var initValues by remember { mutableStateOf(0f to 100f) }
 
     LaunchedEffect(true) {
-        vimel.setData(Singleton.rawMessage, type)
+        vimel.setData(Singleton.rawMessage)
     }
 
     Scaffold(topBar = {
@@ -64,14 +66,7 @@ fun detail_(navigator: DestinationsNavigator, type: Int) {
             IconButton(onClick = { navigator.popBackStack() }) {
                 Icon(Icons.Rounded.ArrowBack, null)
             }
-        }, title = { Text(text = when(type) {
-            TEMP -> "Temp Detail"
-            LUX -> "Light Detail"
-            else -> "Humid Detail"
-        }) }, actions = {
-            IconButton(onClick = vimel::sortByTime) {
-                Icon(imageVector = Icons.Rounded.Sort, contentDescription = null)
-            }
+        }, title = { Text(text = "Analytics") }, actions = {
             IconButton(onClick = { showFilterDialog = true }) {
                 Icon(imageVector = Icons.Rounded.FilterAlt, contentDescription = null)
             }
@@ -79,17 +74,61 @@ fun detail_(navigator: DestinationsNavigator, type: Int) {
     }) {
         Column(Modifier.padding(it)) {
             LazyColumn {
+                item {
+                    Row {
+                        Text(
+                            text = "Temp",
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { vimel.sortBy(Type.TEMP) })
+                        Text(
+                            text = "Humid", modifier = Modifier
+                                .weight(1f)
+                                .clickable { vimel.sortBy(Type.HUMID) })
+                        Text(text = "Lux", modifier = Modifier
+                            .weight(1f)
+                            .clickable { vimel.sortBy(Type.LUX) })
+                        Text(
+                            text = "time",
+                            modifier = Modifier
+                                .weight(2f)
+                                .clickable { vimel.sortBy(Type.TIME) },
+                        )
+                    }
+                }
                 items(uiData) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp)
                     ) {
                         Text(
-                            text = it.first.toString(),
-                            style = MaterialTheme.typography.titleMedium
+                            text = it.temp.toString(),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(text = it.second.toDDMMYYYYHHMM())
+                        Text(
+                            text = it.humid.toString(),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = it.lux.toString(),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = (it.seconds * 1000).toDDMMYYYYHHMM(),
+                            modifier = Modifier.weight(2f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.End
+                        )
                     }
                     Divider()
                 }
@@ -101,7 +140,7 @@ fun detail_(navigator: DestinationsNavigator, type: Int) {
             showFilterDialog = false
         }) { timeRange, valueRange ->
             initTimes = timeRange
-            initValues = valueRange
+            initValues = valueRange.second to valueRange.third
             vimel.filter(timeRange, valueRange)
             showFilterDialog = false
         }
@@ -121,7 +160,7 @@ private fun _filter_dialog(
     initTimes: Pair<Long, Long>,
     initValues: Pair<Float, Float>,
     onDismiss: () -> Unit,
-    onComplete: (Pair<Long, Long>, Pair<Float, Float>) -> Unit
+    onComplete: (Pair<Long, Long>, Triple<Type?, Float, Float>) -> Unit
 ) {
     var initTimes by remember { mutableStateOf(initTimes) }
     var initValues by remember {
@@ -132,6 +171,7 @@ private fun _filter_dialog(
             )
         )
     }
+    var searchSelection: Type? by remember { mutableStateOf(null) }
     Dialog(onDismissRequest = onDismiss) {
         Column(
             Modifier
@@ -145,26 +185,64 @@ private fun _filter_dialog(
                 Text(text = "Time Range", style = MaterialTheme.typography.labelMedium)
                 _time_button(activity = activity, init = initTimes, onDone = { initTimes = it })
             }
+            Spacer(Modifier.height(24.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text(text = "Search")
+                RadioButton(
+                    selected = searchSelection == Type.TEMP,
+                    onClick = {
+                        searchSelection = if (searchSelection == null) Type.TEMP else null
+                    },
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+                Text(text = "Temp")
+                RadioButton(
+                    selected = searchSelection == Type.HUMID,
+                    onClick = {
+                        searchSelection = if (searchSelection == null) Type.HUMID else null
+                    },
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+                Text(text = "Humid")
+                RadioButton(
+                    selected = searchSelection == Type.LUX,
+                    onClick = { searchSelection = if (searchSelection == null) Type.LUX else null },
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(top = 8.dp)
             ) {
                 Text(text = "Threshold", style = MaterialTheme.typography.labelMedium)
                 Spacer(modifier = Modifier.weight(1f))
-                OutlinedTextField(value = initValues.first, onValueChange = {
-                    initValues = initValues.copy(first = it)
-                }, modifier = Modifier.width(80.dp))
+                OutlinedTextField(
+                    value = initValues.first,
+                    onValueChange = { initValues = initValues.copy(first = it) },
+                    modifier = Modifier.width(80.dp),
+                    enabled = searchSelection != null
+                )
                 Text(text = " - ")
-                OutlinedTextField(value = initValues.second, onValueChange = {
-                    initValues = initValues.copy(second = it)
-                }, modifier = Modifier.width(80.dp))
+                OutlinedTextField(
+                    value = initValues.second,
+                    onValueChange = { initValues = initValues.copy(second = it) },
+                    modifier = Modifier.width(80.dp),
+                    enabled = searchSelection != null
+                )
             }
             Button(
                 enabled = initValues.first.toFloatOrNull() != null && initValues.second.toFloatOrNull() != null,
                 onClick = {
                     onComplete(
                         initTimes,
-                        Pair(initValues.first.toFloat(), initValues.second.toFloat())
+                        Triple(
+                            searchSelection,
+                            initValues.first.toFloat(),
+                            initValues.second.toFloat()
+                        )
                     )
                 }, modifier = Modifier
                     .align(Alignment.End)

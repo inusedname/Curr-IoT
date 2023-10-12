@@ -36,7 +36,7 @@
                         <a class="nav-link active" aria-current="page" href="">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link aria-current=" page" href="profile">Profile</a>
+                        <a class="nav-link aria-current=" page" href="./profile.html">Profile</a>
                     </li>
                 </ul>
                 <form class=" d-flex" role="search">
@@ -96,23 +96,32 @@
                 </div>
             </div>
             <div class="col">
-                <div class="card">
+                <div class="card text-white card-stateful" id="card-air-pollution">
                     <div class="card-body child-1">
-                        <h3>Light</h3>
-                        <h1>--</h1>
+                        <h3>Air Pollution</h3>
+                        <h1 id="text-air-pollution">--</h1>
                     </div>
                     <div class="img-box child-2">
-                        <img width="94" height="94" src="https://img.icons8.com/3d-fluency/94/sun.png" alt="sun" />
+                        <img width="94" height="94" src="https://img.icons8.com/3d-fluency/94/dashing-away-1.png"
+                            alt="dashing-away-1" />
                     </div>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-9">
+            <div class="col-md-5">
                 <div class="card">
                     <div class="card-body">
                         <h3>Overview</h3>
                         <canvas id="myChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Light</h3>
+                        <canvas id="subChart"></canvas>
                     </div>
                 </div>
             </div>

@@ -22,9 +22,7 @@ import dev.vstd.myiot.BaseCard
 import dev.vstd.myiot.data.Singleton
 import dev.vstd.myiot.destinations.detail_Destination
 import dev.vstd.myiot.destinations.led_history_Destination
-import dev.vstd.myiot.screen.analytic.HUMID
-import dev.vstd.myiot.screen.analytic.LUX
-import dev.vstd.myiot.screen.analytic.TEMP
+import kotlin.random.Random
 
 @Composable
 fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
@@ -43,7 +41,7 @@ fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
                 Singleton.rawMessage =
                     vimel.rawMessage.value.filter { it.first == MainVimel.Sender.FIREBASE }
                         .map { it.second }
-                navigator.navigate(detail_Destination(TEMP))
+                navigator.navigate(detail_Destination)
             }
         }
         item {
@@ -51,7 +49,7 @@ fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
                 Singleton.rawMessage =
                     vimel.rawMessage.value.filter { it.first == MainVimel.Sender.FIREBASE }
                         .map { it.second }
-                navigator.navigate(detail_Destination(HUMID))
+                navigator.navigate(detail_Destination)
             }
         }
         item {
@@ -59,7 +57,32 @@ fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
                 Singleton.rawMessage =
                     vimel.rawMessage.value.filter { it.first == MainVimel.Sender.FIREBASE }
                         .map { it.second }
-                navigator.navigate(detail_Destination(LUX))
+                navigator.navigate(detail_Destination)
+            }
+        }
+        item {
+            _float_block(
+                title = "Air Pollution",
+                unit = "ppm",
+                value = Random.nextInt(0, 100).toFloat()
+            ) {
+                Singleton.rawMessage =
+                    vimel.rawMessage.value.filter { it.first == MainVimel.Sender.FIREBASE }
+                        .map { it.second }
+                navigator.navigate(detail_Destination)
+            }
+        }
+        item(span = { GridItemSpan(2) }) {
+            BaseCard {
+                Text(text = "Realtime Temp & Humid", style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(16.dp))
+                AndroidView(
+                    factory = { chart.view },
+                    update = { chart.addData(state.humidity, state.temperature, state.lux) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
+                )
             }
         }
         item {
@@ -80,19 +103,6 @@ fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
                 }
             }) {
                 vimel.toggleLed(2, !state.led2On)
-            }
-        }
-        item(span = { GridItemSpan(2) }) {
-            BaseCard {
-                Text(text = "Realtime Temp & Humid", style = MaterialTheme.typography.titleLarge)
-                Spacer(modifier = Modifier.height(16.dp))
-                AndroidView(
-                    factory = { chart.view },
-                    update = { chart.addData(state.humidity, state.temperature) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp)
-                )
             }
         }
     }

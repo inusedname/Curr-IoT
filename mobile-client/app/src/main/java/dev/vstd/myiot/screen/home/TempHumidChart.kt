@@ -8,6 +8,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import dev.vstd.myiot.R
+import kotlin.random.Random
 
 class TempHumidChart(context: Context) {
     private val appTypeface = ResourcesCompat.getFont(context, R.font.poppins)
@@ -18,12 +19,16 @@ class TempHumidChart(context: Context) {
         setup()
     }
 
-    fun addData(humid: Float, temp: Float) {
+    fun addData(humid: Float, temp: Float, lux: Float) {
         val data = view.data
         val humidSet = data.getDataSetByIndex(1)
         val tempSet = data.getDataSetByIndex(0)
+        val luxSet = data.getDataSetByIndex(2)
+        val dustSet = data.getDataSetByIndex(3)
         humidSet.addEntry(Entry(humidSet.entryCount.toFloat(), humid))
         tempSet.addEntry(Entry(tempSet.entryCount.toFloat(), temp))
+        luxSet.addEntry(Entry(luxSet.entryCount.toFloat(), lux))
+        dustSet.addEntry(Entry(dustSet.entryCount.toFloat(), Random.nextInt(0, 100).toFloat()))
         data.notifyDataChanged()
         view.notifyDataSetChanged()
         view.invalidate()
@@ -42,7 +47,9 @@ class TempHumidChart(context: Context) {
         }
         view.data = LineData(
             LineDataSet(null, "Temp").applyStyleDataSet(Color.RED),
-            LineDataSet(null, "Humid").applyStyleDataSet(Color.BLUE)
+            LineDataSet(null, "Humid").applyStyleDataSet(Color.BLUE),
+            LineDataSet(null, "Lux").applyStyleDataSet(Color.GREEN),
+            LineDataSet(null, "Dust").applyStyleDataSet(Color.YELLOW)
         )
     }
 

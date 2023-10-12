@@ -3,9 +3,9 @@
 }
 
 :root {
-    --good-gradient: linear-gradient(to right, #00c853, #00e676);
-    --warning-gradient: linear-gradient(to right, #ffd600, #ffea00);
-    --severe-gradient: linear-gradient(to right, #d50000, #ff1744)
+    --good-gradient: linear-gradient(to right, #0f7439, #00e676);
+    --warning-gradient: linear-gradient(to right, #6d5d0d, #ffea00);
+    --severe-gradient: linear-gradient(to right, #df0000, #f01744)
 }
 
 .main {
@@ -50,4 +50,8 @@ img {
 .status-button {
     font-weight: bold;
     float: right;
+}
+
+#subChart {
+    height: 500px;
 }
