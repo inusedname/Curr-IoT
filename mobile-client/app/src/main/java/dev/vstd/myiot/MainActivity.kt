@@ -56,7 +56,7 @@ fun body(navigator: DestinationsNavigator) {
         Scaffold { paddingValues ->
             Column(Modifier.padding(paddingValues)) {
                 TabRow(selectedTabIndex = pagerState.currentPage) {
-                    arrayOf("Log", "Dashboard").forEachIndexed { index, s ->
+                    arrayOf("Dashboard", "Log").forEachIndexed { index, s ->
                         Tab(selected = pagerState.currentPage == index, onClick = {
                             scope.launch {
                                 pagerState.animateScrollToPage(index)
@@ -92,11 +92,12 @@ fun BaseCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BaseCard(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     colors: CardColors = CardDefaults.cardColors(),
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Card(onClick = onClick) {
+    Card(modifier = modifier, onClick = onClick) {
         Column(modifier = Modifier.padding(8.dp), content = content)
     }
 }

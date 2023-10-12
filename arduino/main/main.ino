@@ -9,10 +9,10 @@
 /************************* WiFi Access Point *********************************/
 // #define wifi_username       "Wokwi-GUEST"
 // #define wifi_password       ""
-// #define wifi_username "Redmi Q"
-// #define wifi_password "246813579"
-#define wifi_username       "PhongNgu3N"
-#define wifi_password       "Quanglinh21"
+#define wifi_username       "Redmi Q"
+#define wifi_password       "246813579"
+// #define wifi_username       "PhongNgu3N"
+// #define wifi_password       "Quanglinh21"
 
 /************************* MQTT Setup *********************************/
 #define MQTT_SERVER         "test.mosquitto.org"

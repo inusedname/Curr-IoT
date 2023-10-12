@@ -2,7 +2,7 @@ package dev.vstd.myiot.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.vstd.myiot.data.LedHistoryModel
+import dev.vstd.myiot.data.LedStatusModel
 import dev.vstd.myiot.data.RemoteCenter
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -11,7 +11,7 @@ class MainVimel : ViewModel() {
     companion object {
         const val TAG = "MainVimel"
     }
-    private val remoteCenter = RemoteCenter()
+    val remoteCenter = RemoteCenter()
 
     val rawMessage = MutableStateFlow<List<Pair<Sender, String>>>(emptyList())
     val uiState = MutableStateFlow(UiState())
@@ -33,8 +33,8 @@ class MainVimel : ViewModel() {
             }
             launch {
                 remoteCenter.ledFlow.collect {
-                    rawMessage.value += Sender.USER to it
-                    val ledHistory = LedHistoryModel.fromJson(it)
+                    rawMessage.value += Sender.USER to "${it.first} ${it.second}"
+                    val ledHistory = LedStatusModel.from(it.first, it.second)
                     when (ledHistory.which) {
                         1 -> {
                             uiState.value = uiState.value.copy(led1On = ledHistory.on)
@@ -50,9 +50,6 @@ class MainVimel : ViewModel() {
 
     fun toggleLed(which: Int, boolean: Boolean) {
         remoteCenter.toggleLed(which, boolean)
-        viewModelScope.launch {
-            rawMessage.value += Sender.USER to "Toggle LED$which: $boolean"
-        }
     }
 
     enum class Sender {

@@ -10,10 +10,16 @@ class DetailVimel : ViewModel() {
     val uiData = MutableStateFlow(listOf<Pair<Float, Long>>())
     private var increased = false
 
-    fun setData(data: List<String>) {
+    fun setData(data: List<String>, type: Int) {
         allData.value = data.map {
             val pojo = SensorModel.fromJson(it)
-            pojo.temp to pojo.seconds * 1000
+
+            when (type) {
+                TEMP -> pojo.temp
+                HUMID -> pojo.humid
+                LUX -> pojo.lux
+                else -> throw IllegalArgumentException("Unknown type: $type")
+            } to pojo.seconds * 1000
         }
         uiData.value = allData.value
     }

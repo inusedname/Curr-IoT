@@ -21,6 +21,10 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.vstd.myiot.BaseCard
 import dev.vstd.myiot.data.Singleton
 import dev.vstd.myiot.destinations.detail_Destination
+import dev.vstd.myiot.destinations.led_history_Destination
+import dev.vstd.myiot.screen.analytic.HUMID
+import dev.vstd.myiot.screen.analytic.LUX
+import dev.vstd.myiot.screen.analytic.TEMP
 
 @Composable
 fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
@@ -36,28 +40,46 @@ fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
     ) {
         item {
             _float_block(title = "Temperature", unit = "oC", value = state.temperature) {
-                Singleton.rawMessage = vimel.rawMessage.value.map { it.second }
-                navigator.navigate(detail_Destination)
+                Singleton.rawMessage =
+                    vimel.rawMessage.value.filter { it.first == MainVimel.Sender.FIREBASE }
+                        .map { it.second }
+                navigator.navigate(detail_Destination(TEMP))
             }
         }
         item {
             _float_block(title = "Humidity", unit = "%", value = state.humidity) {
-
+                Singleton.rawMessage =
+                    vimel.rawMessage.value.filter { it.first == MainVimel.Sender.FIREBASE }
+                        .map { it.second }
+                navigator.navigate(detail_Destination(HUMID))
             }
         }
         item {
             _float_block(title = "Lightness", unit = "lux", value = state.lux) {
-
+                Singleton.rawMessage =
+                    vimel.rawMessage.value.filter { it.first == MainVimel.Sender.FIREBASE }
+                        .map { it.second }
+                navigator.navigate(detail_Destination(LUX))
             }
         }
         item {
-            _switch_block(title = "Bedroom Light", value = state.led1On) {
-                vimel.toggleLed(0, !state.led1On)
+            _switch_block(title = "Living Room Light", value = state.led1On, onClick = {
+                vimel.remoteCenter.getLedHistorySnapshot {
+                    Singleton.rawLedHistory = it
+                    navigator.navigate(led_history_Destination)
+                }
+            }) {
+                vimel.toggleLed(1, !state.led1On)
             }
         }
         item {
-            _switch_block(title = "Fan", value = state.led2On) {
-                vimel.toggleLed(1, !state.led2On)
+            _switch_block(title = "Bedroom Light", value = state.led2On, onClick = {
+                vimel.remoteCenter.getLedHistorySnapshot {
+                    Singleton.rawLedHistory = it
+                    navigator.navigate(led_history_Destination)
+                }
+            }) {
+                vimel.toggleLed(2, !state.led2On)
             }
         }
         item(span = { GridItemSpan(2) }) {
@@ -84,11 +106,11 @@ private fun _float_block(
     decimal: Int = 1,
     onClick: () -> Unit,
 ) {
-    BaseCard(onClick = onClick) {
+    BaseCard(modifier = Modifier.height(124.dp), onClick = onClick) {
         Text(title, style = MaterialTheme.typography.titleLarge)
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(String.format("%.${decimal}f", value), fontSize = 56.sp)
-            Text(text = unit, fontSize = 12.sp, modifier = Modifier.padding(start = 8.dp))
+            Text(String.format("%.${decimal}f", value), fontSize = 32.sp)
+            Text(text = unit, fontSize = 16.sp, modifier = Modifier.padding(start = 8.dp))
         }
     }
 }
@@ -97,13 +119,17 @@ private fun _float_block(
 private fun _switch_block(
     title: String,
     value: Boolean,
+    onClick: () -> Unit,
     onSwitch: () -> Unit
 ) {
-    BaseCard(onSwitch) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+    BaseCard(modifier = Modifier.height(124.dp), onClick) {
+        Column {
             Text(title, style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.weight(1f))
-            Switch(checked = value, onCheckedChange = { onSwitch() }, modifier = Modifier.width(64.dp))
+            Switch(
+                modifier = Modifier.weight(1f),
+                checked = value,
+                onCheckedChange = { onSwitch() },
+            )
         }
     }
 }

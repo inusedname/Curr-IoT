@@ -34,10 +34,14 @@ import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
 
+const val TEMP = 0
+const val HUMID = 1
+const val LUX = 2
+
 @Destination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun detail_(navigator: DestinationsNavigator) {
+fun detail_(navigator: DestinationsNavigator, type: Int) {
     val vimel: DetailVimel = viewModel()
     val activity = LocalContext.current as FragmentActivity
 
@@ -52,7 +56,7 @@ fun detail_(navigator: DestinationsNavigator) {
     var initValues by remember { mutableStateOf(0f to 100f) }
 
     LaunchedEffect(true) {
-        vimel.setData(Singleton.rawMessage)
+        vimel.setData(Singleton.rawMessage, type)
     }
 
     Scaffold(topBar = {
@@ -60,7 +64,11 @@ fun detail_(navigator: DestinationsNavigator) {
             IconButton(onClick = { navigator.popBackStack() }) {
                 Icon(Icons.Rounded.ArrowBack, null)
             }
-        }, title = { Text(text = "Analytics") }, actions = {
+        }, title = { Text(text = when(type) {
+            TEMP -> "Temp Detail"
+            LUX -> "Light Detail"
+            else -> "Humid Detail"
+        }) }, actions = {
             IconButton(onClick = vimel::sortByTime) {
                 Icon(imageVector = Icons.Rounded.Sort, contentDescription = null)
             }
@@ -108,7 +116,7 @@ fun Long.toDDMMYYYYHHMM(): String {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun _filter_dialog(
+private fun _filter_dialog(
     activity: FragmentActivity,
     initTimes: Pair<Long, Long>,
     initValues: Pair<Float, Float>,
