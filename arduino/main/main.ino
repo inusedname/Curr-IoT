@@ -52,6 +52,7 @@ void setup() {
   
   timeClient.begin();
   dht.begin();
+  randomSeed(analogRead(0));
   mqttClient.onMessage(onMqttMessage);
   mqttClient.subscribe(MQTT_LED1_TOPIC);
   mqttClient.subscribe(MQTT_LED2_TOPIC);
@@ -123,6 +124,7 @@ char* jsonify(float humid, float temp, float lux, int time) {
   doc["humid"] = humid;
   doc["temp"] = temp;
   doc["lux"] = lux;
+  doc["dust"] = random(101);
   doc["seconds"] = time;
   
   char* json = new char[256];

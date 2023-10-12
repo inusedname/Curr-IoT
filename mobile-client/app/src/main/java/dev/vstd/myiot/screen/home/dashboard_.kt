@@ -64,7 +64,7 @@ fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
             _float_block(
                 title = "Air Pollution",
                 unit = "ppm",
-                value = Random.nextInt(0, 100).toFloat()
+                value = state.dust.toFloat(),
             ) {
                 Singleton.rawMessage =
                     vimel.rawMessage.value.filter { it.first == MainVimel.Sender.FIREBASE }

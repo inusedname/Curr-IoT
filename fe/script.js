@@ -53,11 +53,12 @@ const database = getDatabase(app);
 const sensorRef = ref(database, 'sensorData');
 const statusPull = ref(database, 'status');
 
-let textHumid = document.getElementById('text-humid');
-let textTemp = document.getElementById('text-temp');
-let textLight = document.getElementById('text-light');
-let livingRoomSwitch = document.getElementById('living-room-switch');
-let bedroomSwith = document.getElementById('bedroom-switch');
+const textHumid = document.getElementById('text-humid');
+const textTemp = document.getElementById('text-temp');
+const textLight = document.getElementById('text-light');
+const textDust = document.getElementById('text-air-pollution');
+const livingRoomSwitch = document.getElementById('living-room-switch');
+const bedroomSwith = document.getElementById('bedroom-switch');
 
 let disableInit = true;
 onChildAdded(sensorRef, (snapshot) => {
@@ -68,22 +69,13 @@ onChildAdded(sensorRef, (snapshot) => {
         document.getElementById('card-temp').style.backgroundImage = getTempLevel(obj.temp);
         textTemp.innerHTML = obj.temp.toFixed(1);
         document.getElementById('card-humid').style.backgroundImage = getHumidLevel(obj.humid);
-        if (obj.lux != null) {
-            textLight.innerHTML = obj.lux.toFixed(1);
-            document.getElementById('card-light').style.backgroundImage = getLightLevel(obj.lux);
-        }
-        addData(obj.temp, obj.humid, obj.lux, airPolluion);
+        textDust.innerHTML = obj.dust.toFixed(1);
+        document.getElementById('card-air-pollution').style.backgroundImage = getAirPollutionLevel(obj.dust);
+        textLight.innerHTML = obj.lux.toFixed(1);
+        document.getElementById('card-light').style.backgroundImage = getLightLevel(obj.lux);
+        addData(obj.temp, obj.humid, obj.lux, obj.dust);
     }
 });
-
-var airPolluion = 100;
-
-setInterval(() => {
-    // airPolluion += Math.floor(Math.random() * 7) - 5;
-    airPolluion = Math.floor(Math.random() * 100);
-    document.getElementById('text-air-pollution').innerHTML = airPolluion.toFixed(1);
-    document.getElementById('card-air-pollution').style.backgroundImage = getAirPollutionLevel(airPolluion);
-}, 1000);
 
 onChildAdded(query(sensorRef, limitToLast(10)), (snapshot) => {
     const data = snapshot.val();
@@ -96,7 +88,7 @@ onChildAdded(query(sensorRef, limitToLast(10)), (snapshot) => {
         textLight.innerHTML = obj.lux.toFixed(1);
         document.getElementById('card-light').style.backgroundImage = getLightLevel(obj.lux);
     }
-    addData(obj.temp, obj.humid, obj.lux, airPolluion);
+    addData(obj.temp, obj.humid, obj.lux, obj.dust);
 });
 
 

@@ -8,9 +8,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class MainVimel : ViewModel() {
-    companion object {
-        const val TAG = "MainVimel"
-    }
     val remoteCenter = RemoteCenter()
 
     val rawMessage = MutableStateFlow<List<Pair<Sender, String>>>(emptyList())
@@ -26,6 +23,7 @@ class MainVimel : ViewModel() {
                     uiState.value = uiState.value.copy(
                         temperature = sensorData.temp,
                         humidity = sensorData.humid,
+                        dust = sensorData.dust,
                         lux = sensorData.lux,
                         time = sensorData.seconds,
                     )
@@ -65,6 +63,7 @@ class MainVimel : ViewModel() {
         val temperature: Float = 0f,
         val humidity: Float = 0f,
         val lux: Float = 0f,
+        val dust: Int = 0,
         val time: Long = 0L,
         val led1On: Boolean = false,
         val led2On: Boolean = false,

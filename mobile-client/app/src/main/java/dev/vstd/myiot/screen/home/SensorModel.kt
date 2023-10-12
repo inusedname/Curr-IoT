@@ -6,6 +6,7 @@ data class SensorModel(
     val humid: Float,
     val temp: Float,
     val lux: Float,
+    val dust: Int,
     val seconds: Long,
 ) {
     companion object {

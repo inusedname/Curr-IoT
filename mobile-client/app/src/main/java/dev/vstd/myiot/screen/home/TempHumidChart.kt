@@ -49,7 +49,7 @@ class TempHumidChart(context: Context) {
             LineDataSet(null, "Temp").applyStyleDataSet(Color.RED),
             LineDataSet(null, "Humid").applyStyleDataSet(Color.BLUE),
             LineDataSet(null, "Lux").applyStyleDataSet(Color.GREEN),
-            LineDataSet(null, "Dust").applyStyleDataSet(Color.YELLOW)
+            LineDataSet(null, "Dust").applyStyleDataSet(Color.MAGENTA)
         )
     }
 
