@@ -64,7 +64,7 @@ fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
             _float_block(
                 title = "Air Pollution",
                 unit = "ppm",
-                value = state.dust.toFloat(),
+                value = state.dust,
             ) {
                 Singleton.rawMessage =
                     vimel.rawMessage.value.filter { it.first == MainVimel.Sender.FIREBASE }
@@ -112,14 +112,13 @@ fun dashboard_(vimel: MainVimel, navigator: DestinationsNavigator) {
 private fun _float_block(
     title: String = "temp",
     unit: String,
-    value: Float = 27f,
-    decimal: Int = 1,
+    value: Number,
     onClick: () -> Unit,
 ) {
     BaseCard(modifier = Modifier.height(124.dp), onClick = onClick) {
         Text(title, style = MaterialTheme.typography.titleLarge)
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(String.format("%.${decimal}f", value), fontSize = 32.sp)
+            Text(if (value is Float) String.format("%.1f", value) else value.toString(), fontSize = 32.sp)
             Text(text = unit, fontSize = 16.sp, modifier = Modifier.padding(start = 8.dp))
         }
     }

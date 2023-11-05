@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js'
-import { getDatabase, ref, onChildAdded, set, onValue, child, onChildChanged, query, limitToLast } from "./firebase-database.js"
+import { getDatabase, ref, onChildAdded, set, onValue, child, onChildChanged, query, limitToLast, get } from "./firebase-database.js"
 import { firebaseConfig } from './secrets.js'
 
 let chart = new Chart(document.getElementById('myChart'), {
@@ -30,11 +30,14 @@ let subChart = new Chart(document.getElementById('subChart'), {
     },
 });
 
+
+
 function addData (temp, humid, light, air) {
     chart.data.labels.push('10:00');
     subChart.data.labels.push('10:00');
     if (chart.data.datasets[0].data.length > 9) {
         chart.data.labels.shift();
+        subChart.data.labels.shift();
         chart.data.datasets[0].data.shift();
         chart.data.datasets[1].data.shift();
         chart.data.datasets[2].data.shift();
@@ -162,3 +165,16 @@ let getAirPollutionLevel = light => {
 }
 
 let getVar = str => getComputedStyle(document.documentElement).getPropertyValue(str);
+
+// Cái này thầy yêu cầu query database nma realtime thì làm thế này thôi
+get(sensorRef).then((snapshot) => {
+    let data = [];
+    snapshot.forEach(child => {
+        data.push(JSON.parse(child.val()))
+    });
+    console.log(data);
+    let maniped = data.filter((body) => body.temp >= 79);
+    maniped = data.filter((body) => body.lux >= 4887.0);
+    maniped = maniped.sort((a, b) => a.seconds - b.seconds);
+    console.log(maniped);
+});
